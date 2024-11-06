@@ -27,9 +27,11 @@ public class Login extends HttpServlet {
             request.getRequestDispatcher("index.jsp").forward(request, response);
         } else {
             // 登录成功，创建会话并跳转到成功页
-            HttpSession session = request.getSession();
-            session.setAttribute("user", user);
-            response.sendRedirect("https://jwc.dgut.edu.cn/");
+            //将用户名设置为请求属性
+            request.setAttribute("username", username);
+            //RequestDispatcher不会重定向，不会让数据丢失
+            RequestDispatcher dispatcher = request.getRequestDispatcher("victory.jsp");
+            dispatcher.forward(request, response);
         }
     }
 
