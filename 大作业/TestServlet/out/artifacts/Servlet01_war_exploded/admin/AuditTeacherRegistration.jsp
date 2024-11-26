@@ -54,6 +54,21 @@
         .btn.deny {
             background-color: #f44336;
         }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2196f3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .back-btn:hover {
+            background-color: #1e88e5;
+        }
     </style>
 </head>
 <body>
@@ -77,7 +92,7 @@
 
             try {
                 conn = DatabaseUtil.getConnection(); // 使用DatabaseUtil获取连接
-                String query = "SELECT id, username, created_at, status FROM users WHERE role = 'teacher' AND status = 'pending'";
+                String query = "SELECT id, username, created_at, status FROM users WHERE (role = 'teacher' or role = 'admin') AND status = 'pending'";
                 stmt = conn.prepareStatement(query);
                 rs = stmt.executeQuery();
 
@@ -121,6 +136,8 @@
         %>
         </tbody>
     </table>
+    <!-- 返回按钮 -->
+    <a href="${pageContext.request.contextPath}/admin.jsp" class="back-btn">返回管理员登录</a>
 </div>
 </body>
 </html>

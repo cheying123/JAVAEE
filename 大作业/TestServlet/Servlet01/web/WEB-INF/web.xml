@@ -40,7 +40,6 @@
     <servlet-mapping>
         <servlet-name>AuditTeacherServlet</servlet-name>
         <url-pattern>/AuditTeacherServlet</url-pattern>
-        <!--        从url-pattern 对应的servlet-name 找到 servlet-class对应的servlet-name ，
-                    再从servlet-class中的名字找到对应的类-->
+
     </servlet-mapping>
 </web-app>
