@@ -1,8 +1,6 @@
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
-
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -33,7 +31,7 @@ public class Login extends HttpServlet {
             // 建立数据库连接
             conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
 
-            String checkUserQuery = "SELECT * FROM users WHERE username = ? and role = ? ";
+            String checkUserQuery = "SELECT * FROM users WHERE username = ? AND role = ?";
             //zh是表名，ac是表里面的类名
             stmt = conn.prepareStatement(checkUserQuery);           //预编译SQL语句
             stmt.setString(1, username);              //设置第1个参数为"username"
@@ -41,60 +39,62 @@ public class Login extends HttpServlet {
             rs = stmt.executeQuery();                              //返回查询结果
 
             if (rs.next()) {           // 如果有结果，说明用户名已存在
-                String checkUserPW = "SELECT * FROM users WHERE username = ? and password = ?";
+                String checkUserPW = "SELECT * FROM users WHERE username = ? AND password = ?";
                 stmt = conn.prepareStatement(checkUserPW);
-                stmt.setString(1,username);
-                stmt.setString(2,password);
+                stmt.setString(1, username);
+                stmt.setString(2, password);
                 rs = stmt.executeQuery();
-                if( rs.next() ){
-                    String checkUserST = "SELECT * FROM users WHERE username = ? and password = ? and status = 'approved'";
+
+                if (rs.next()) {
+                    String checkUserST = "SELECT * FROM users WHERE username = ? AND password = ? AND status = 'approved'";
                     stmt = conn.prepareStatement(checkUserST);
-                    stmt.setString(1,username);
-                    stmt.setString(2,password);
+                    stmt.setString(1, username);
+                    stmt.setString(2, password);
                     rs = stmt.executeQuery();
 
-                    if(rs.next()){
-                        //将用户名设置为请求属性
-                        request.setAttribute("username", username);
-                        //RequestDispatcher不会重定向，不会让数据丢失
-                        if( identify.equals("teacher") ){
+                    if (rs.next()) {
+                        // 登录成功，设置Session中的用户名
+                        int userId = Integer.valueOf(rs.getString("id"));
+                        HttpSession session = request.getSession();
+                        session.setAttribute("username", username); // 存储用户名到Session
+
+                        // 根据角色重定向到不同的页面
+                        if ("teacher".equals(identify)) {
+                            session.setAttribute("teacherId", userId);  // 存储教师ID到Session
                             RequestDispatcher dispatcher = request.getRequestDispatcher("teacher.jsp");
                             dispatcher.forward(request, response);
-                        }
-                        else if( identify.equals("parent") ){
+                        } else if ("parent".equals(identify)) {
+                            session.setAttribute("parentId", userId);  // 存储家长ID到Session
                             RequestDispatcher dispatcher = request.getRequestDispatcher("parent.jsp");
                             dispatcher.forward(request, response);
-                        }
-                        else if( identify.equals("admin") ){
+                        } else if ("admin".equals(identify)) {
+                            session.setAttribute("adminId", userId);  // 存储管理员ID到Session
                             RequestDispatcher dispatcher = request.getRequestDispatcher("admin.jsp");
                             dispatcher.forward(request, response);
                         }
 
-                    }else{
+                    } else {
                         request.setAttribute("errorMessage", "用户未审核");
                         request.setAttribute("username", username); // 保留输入的用户名
                         request.getRequestDispatcher("index.jsp").forward(request, response);
                         return;
                     }
 
-                }else{
+                } else {
                     request.setAttribute("errorMessage", "密码错误");
                     request.setAttribute("username", username); // 保留输入的用户名
                     request.getRequestDispatcher("index.jsp").forward(request, response);
                     return;
                 }
 
-                return;
-            }else{
+            } else {
                 request.setAttribute("errorMessage", "用户名不存在或者身份错误");
                 request.setAttribute("username", username); // 保留输入的用户名
                 request.getRequestDispatcher("index.jsp").forward(request, response);
                 return;
             }
 
-
-
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new ServletException("数据库访问出错", e); // 如果出错，抛出异常
         } finally {

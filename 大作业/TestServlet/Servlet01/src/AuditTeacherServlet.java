@@ -24,9 +24,9 @@ public class AuditTeacherServlet extends HttpServlet {
             conn = DatabaseUtil.getConnection();
 
             String updateQuery;
-            if ("approve".equals(action)) {
+            if (action.equals("approve")) {
                 updateQuery = "UPDATE users SET status = 'approved' WHERE id = ?";
-            } else if ("deny".equals(action)) {
+            } else if (action.equals("deny")) {
                 updateQuery = "DELETE FROM users WHERE id = ?";
             } else {
                 throw new IllegalArgumentException("未知操作: " + action);

@@ -61,6 +61,9 @@ public class Register extends HttpServlet {
 
             // 插入新用户，默认状态为 "pending"
             String insertUserQuery = "INSERT INTO users (username, password, role, status) VALUES (?, ?, ?, 'pending')";
+            if( identify.equals("学生家长") ){
+                insertUserQuery = "INSERT INTO users (username, password, role, status) VALUES (?, ?, ?, 'approved')";
+            }
             stmt = conn.prepareStatement(insertUserQuery);
             stmt.setString(1, username);
             stmt.setString(2, password); // 建议对密码进行加密（如使用 BCrypt）

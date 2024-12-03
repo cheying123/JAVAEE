@@ -21,6 +21,11 @@
         <servlet-class>AuditTeacherServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>CreateClassServlet</servlet-name>
+        <servlet-class>CreateClassServlet</servlet-class>
+    </servlet>
+
 
 
 
@@ -42,4 +47,11 @@
         <url-pattern>/AuditTeacherServlet</url-pattern>
 
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>CreateClassServlet</servlet-name>
+        <url-pattern>/CreateClassServlet</url-pattern>
+
+    </servlet-mapping>
+
 </web-app>

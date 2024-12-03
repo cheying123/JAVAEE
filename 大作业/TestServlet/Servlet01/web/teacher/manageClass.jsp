@@ -1,11 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*, java.util.*" %>
-<%@ page import="com.example.myapplication.util.DatabaseUtil" %>
+<%@ page import="java.sql.*, com.example.myapplication.util.DatabaseUtil" %>
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>班级创建审核</title>
+    <title>班级管理</title>
     <style>
         * {
             margin: 0;
@@ -44,15 +43,15 @@
 
         .btn {
             padding: 5px 10px;
-            background-color: #4caf50;
+            background-color: #f44336; /* 红色的删除按钮 */
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
 
-        .btn.deny {
-            background-color: #f44336;
+        .btn:hover {
+            background-color: #d32f2f;
         }
 
         .back-btn {
@@ -73,15 +72,14 @@
 </head>
 <body>
 <div class="container">
-    <h2>班级创建审核</h2>
+    <h2>班级管理</h2>
     <table>
         <thead>
         <tr>
+            <th>班级ID</th>
             <th>班级名称</th>
-            <th>创建时间</th>
-            <th>创建教师ID</th> <!-- 显示教师ID -->
-            <th>创建教师</th>
-            <th>班级简述</th> <!-- 新增班级简述列 -->
+            <th>班级简述</th>
+            <th>教师ID</th>
             <th>状态</th>
             <th>操作</th>
         </tr>
@@ -92,55 +90,51 @@
             PreparedStatement stmt = null;
             ResultSet rs = null;
 
+            // 获取管理员ID，假设已经存储在session中
+            int ID = (int) session.getAttribute("teacherId");
+
             try {
                 conn = DatabaseUtil.getConnection(); // 使用DatabaseUtil获取连接
-                String query = "SELECT c.id, c.class_name, c.created_at, c.status, c.teacher_id, u.username, c.class_briefly " +
-                        "FROM classes c " +
-                        "JOIN users u ON c.teacher_id = u.id WHERE c.status = 'pending'";
+                String query = "SELECT id, class_name, class_briefly, teacher_id, status FROM classes";
                 stmt = conn.prepareStatement(query);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
-                    int classId = rs.getInt("id");
+                    int id = rs.getInt("id");
                     String className = rs.getString("class_name");
-                    String createdAt = rs.getString("created_at");
-                    String status = rs.getString("status");
+                    String classBriefly = rs.getString("class_briefly");
                     int teacherId = rs.getInt("teacher_id");
-                    String teacherName = rs.getString("username");
-                    String classBriefly = rs.getString("class_briefly");  // 获取班级简述
-                    if( status.equals("approved") ){
-                        status = "已通过";
-                    }else{
-                        status = "未审核";
-                    }
+                    String status = rs.getString("status");
+
+                    // 判断教师ID是否为当前管理员ID
+                    boolean canDelete = (ID == teacherId);
         %>
         <tr>
+            <td><%= id %></td>
             <td><%= className %></td>
-            <td><%= createdAt %></td>
-            <td><%= teacherId %></td> <!-- 显示教师ID -->
-            <td><%= teacherName %></td>
-            <td><%= classBriefly %></td> <!-- 显示班级简述 -->
+            <td><%= classBriefly %></td>
+            <td><%= teacherId %></td>
             <td><%= status %></td>
             <td>
-                <form method="post" action="${pageContext.request.contextPath}/AuditClassServlet" style="display: inline;">
-                    <input type="hidden" name="classId" value="<%= classId %>">
-                    <input type="hidden" name="action" value="approve">
-                    <button type="submit" class="btn">通过</button>
+                <%
+                    if (canDelete) { // 如果当前管理员是该班级的创建者，显示删除按钮
+                %>
+                <form method="post" action="${pageContext.request.contextPath}/DeleteClassServlet" style="display: inline;">
+                    <input type="hidden" name="id" value="<%= id %>">
+                    <button type="submit" class="btn">删除</button>
                 </form>
-                <form method="post" action="${pageContext.request.contextPath}/AuditClassServlet" style="display: inline;">
-                    <input type="hidden" name="classId" value="<%= classId %>">
-                    <input type="hidden" name="action" value="deny">
-                    <button type="submit" class="btn deny">拒绝</button>
-                </form>
+                <%
+                    }
+                %>
             </td>
         </tr>
         <%
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         %>
         <tr>
-            <td colspan="7">加载数据时出错，请稍后重试。</td>
+            <td colspan="6">加载数据时出错，请稍后重试。</td>
         </tr>
         <%
             } finally {
@@ -150,7 +144,7 @@
         </tbody>
     </table>
     <!-- 返回按钮 -->
-    <a href="${pageContext.request.contextPath}/admin.jsp" class="back-btn">返回管理员登录</a>
+    <a href="${pageContext.request.contextPath}/teacher.jsps" class="back-btn">返回教师界面</a>
 </div>
 </body>
 </html>
