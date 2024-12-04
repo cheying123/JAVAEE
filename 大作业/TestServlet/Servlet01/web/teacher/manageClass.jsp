@@ -144,7 +144,7 @@
         </tbody>
     </table>
     <!-- 返回按钮 -->
-    <a href="${pageContext.request.contextPath}/teacher.jsps" class="back-btn">返回教师界面</a>
+    <a href="${pageContext.request.contextPath}/teacher.jsp" class="back-btn">返回教师界面</a>
 </div>
 </body>
 </html>

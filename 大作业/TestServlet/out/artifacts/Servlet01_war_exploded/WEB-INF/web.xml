@@ -26,6 +26,19 @@
         <servlet-class>CreateClassServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>JoinClassServlet</servlet-name>
+        <servlet-class>JoinClassServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ApproveJoinRequestServlet</servlet-name>
+        <servlet-class>ApproveJoinRequestServlet</servlet-class>
+    </servlet>
+
+
+
+
 
 
 
@@ -53,5 +66,18 @@
         <url-pattern>/CreateClassServlet</url-pattern>
 
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>JoinClassServlet</servlet-name>
+        <url-pattern>/JoinClassServlet</url-pattern>
+
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ApproveJoinRequestServlet</servlet-name>
+        <url-pattern>/ApproveJoinRequestServlet</url-pattern>
+
+    </servlet-mapping>
+
 
 </web-app>

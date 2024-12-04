@@ -99,9 +99,11 @@
     <div class="dashboard-wrapper">
         <div class="header">老师功能界面</div>
         <a href="teacher/createClass.jsp" class="menu-item">创建班级</a>
+        <a href="teacher/joinClass.jsp" class="menu-item">加入班级</a>
         <a href="teacher/manageClass.jsp" class="menu-item">管理班级</a>
+        <a href="teacher/manageJoinRequests.jsp" class="menu-item">管理班级加入申请</a>
+
         <a href="teacher/postNotification.jsp" class="menu-item">发布班级通知</a>
-        <a href="teacher/queryPerformance.jsp" class="menu-item">查看个人业绩</a>
         <a href="index.jsp" class="menu-item">退出登录</a>
 
         <!-- 我的班级列表 -->
@@ -122,6 +124,10 @@
                         Connection conn = null;
                         PreparedStatement stmt = null;
                         ResultSet rs = null;
+                        if(request.getSession().getAttribute("teacherId") == null){
+                            response.sendRedirect("index.jsp");  // 如果没有登录，跳转到登录页面
+                            return;
+                        }
                         int teacherId = (int) request.getSession().getAttribute("teacherId");
                         try {
                             conn = DatabaseUtil.getConnection();
