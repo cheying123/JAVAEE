@@ -103,73 +103,9 @@
         <a href="teacher/manageClass.jsp" class="menu-item">管理班级</a>
         <a href="teacher/manageJoinRequests.jsp" class="menu-item">管理班级加入申请</a>
 
-        <a href="teacher/postNotification.jsp" class="menu-item">发布班级通知</a>
+        <a href="teacher/manageClassNotifications.jsp" class="menu-item">管理班级通知</a>
         <a href="index.jsp" class="menu-item">退出登录</a>
 
-        <!-- 我的班级列表 -->
-        <div class="section">
-            <h3 style="text-align: center; color: #555;">我的班级</h3>
-            <div class="table-container">
-                <table>
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>班级名称</th>
-                        <th>状态</th>
-                        <th>创建时间</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <%
-                        Connection conn = null;
-                        PreparedStatement stmt = null;
-                        ResultSet rs = null;
-                        if(request.getSession().getAttribute("teacherId") == null){
-                            response.sendRedirect("index.jsp");  // 如果没有登录，跳转到登录页面
-                            return;
-                        }
-                        int teacherId = (int) request.getSession().getAttribute("teacherId");
-                        try {
-                            conn = DatabaseUtil.getConnection();
-                            String query = "SELECT id, class_name, status, created_at FROM classes WHERE teacher_id = ?";
-                            stmt = conn.prepareStatement(query);
-                            stmt.setInt(1, teacherId);
-                            rs = stmt.executeQuery();
-
-                            while (rs.next()) {
-                                int id = rs.getInt("id");
-                                String name = rs.getString("class_name");
-                                String status = rs.getString("status");
-                                if( status.equals("approved") ){
-                                    status = "已通过";
-                                }else{
-                                    status = "未审核";
-                                }
-                                String createdAt = rs.getString("created_at");
-                    %>
-                    <tr>
-                        <td><%= id %></td>
-                        <td><%= name %></td>
-                        <td><%= status %></td>
-                        <td><%= createdAt %></td>
-                    </tr>
-                    <%
-                        }
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    %>
-                    <tr>
-                        <td colspan="4">加载数据时出错！</td>
-                    </tr>
-                    <%
-                        } finally {
-                            DatabaseUtil.close(conn, stmt, rs);
-                        }
-                    %>
-                    </tbody>
-                </table>
-            </div>
-        </div>
     </div>
 </div>
 </body>

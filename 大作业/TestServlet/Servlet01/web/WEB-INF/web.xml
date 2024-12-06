@@ -36,6 +36,18 @@
         <servlet-class>ApproveJoinRequestServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>AddClassNotificationServlet</servlet-name>
+        <servlet-class>AddClassNotificationServlet</servlet-class>
+    </servlet>
+
+
+
+    <servlet>
+        <servlet-name>DeleteNotificationServlet</servlet-name>
+        <servlet-class>DeleteClassNotificationServlet</servlet-class>
+    </servlet>
+
 
 
 
@@ -79,5 +91,18 @@
 
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>AddClassNotificationServlet</servlet-name>
+        <url-pattern>/AddClassNotificationServlet</url-pattern>
+
+    </servlet-mapping>
+
+
+
+    <servlet-mapping>
+        <servlet-name>DeleteNotificationServlet</servlet-name>
+        <url-pattern>/DeleteNotificationServlet</url-pattern>
+
+    </servlet-mapping>
 
 </web-app>
