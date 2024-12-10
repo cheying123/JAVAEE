@@ -131,7 +131,6 @@
         <thead>
         <tr>
             <th>ID</th>
-            <th>班级</th> <!-- 新增列 -->
             <th>标题</th>
             <th>内容</th>
             <th>发布时间</th>
@@ -147,41 +146,35 @@
             try {
                 conn = DatabaseUtil.getConnection();
 
-                // 获取当前登录的教师ID
-                // 获取当前登录的教师ID
-                Integer teacherId = (Integer) request.getSession().getAttribute("teacherId");
-                if (teacherId == null) {
+                // 获取当前登录的管理员ID
+                Integer adminId = (Integer) request.getSession().getAttribute("adminId");
+                if (adminId == null) {
                     response.sendRedirect("../index.jsp");  // 如果没有登录，跳转到登录页面
                     return;
                 }
 
-                // 修改SQL查询，联接查询班级名称
-                String query = "SELECT cn.id, cn.title, cn.content, cn.created_at, cn.class_id, c.class_name " +
-                        "FROM class_notifications cn " +
-                        "JOIN classes c ON cn.class_id = c.id " +
-                        "WHERE cn.teacher_id = ?";
+                // 查询管理员发布的通知
+                String query = "SELECT id, title, content, created_at FROM admin_notifications WHERE admin_id = ?";
                 stmt = conn.prepareStatement(query);
-                stmt.setInt(1, (Integer) session.getAttribute("teacherId"));
+                stmt.setInt(1, adminId); // 绑定管理员ID
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {
                     String title = rs.getString("title");
                     String content = rs.getString("content");
-                    String class_Name = rs.getString("class_name"); // 获取班级名称
                     // 截取前100个字符显示
                     String truncatedTitle = title.length() > 20 ? title.substring(0, 20) + "..." : title;
                     String truncatedContent = content.length() > 100 ? content.substring(0, 100) + "..." : content;
         %>
         <tr>
             <td><%= rs.getInt("id") %></td>
-            <td><%= class_Name %></td> <!-- 显示班级名称 -->
             <td class="notification-title"><%= truncatedTitle %></td>
             <td class="notification-content"><%= truncatedContent %></td>
             <td><%= rs.getTimestamp("created_at") %></td>
             <td>
                 <!-- 查看详细内容按钮 -->
-                <a href="<%= request.getContextPath() + "/viewTeacherNotification.jsp?id=" + rs.getInt("id") %>" class="view-btn">查看详情</a>
-                <form action="${pageContext.request.contextPath}/DeleteNotificationServlet" method="post" style="display:inline;">
+                <a href="<%= request.getContextPath() + "viewAdminNotification.jsp?id=" + rs.getInt("id") %>" class="view-btn">查看详情</a>
+                <form action="${pageContext.request.contextPath}/DeleteAdminNotificationServlet" method="post" style="display:inline;">
                     <input type="hidden" name="notification_id" value="<%= rs.getInt("id") %>">
                     <button type="submit" class="delete-btn">删除</button>
                 </form>
@@ -198,8 +191,8 @@
         </tbody>
     </table>
 
-    <a href="${pageContext.request.contextPath}/teacher/addClassNotification.jsp" class="back-btn">发布通知</a>
-    <a href="${pageContext.request.contextPath}/teacher.jsp" class="back-btn">返回教师界面</a>
+    <a href="${pageContext.request.contextPath}/admin/addNotification.jsp" class="back-btn">发布通知</a>
+    <a href="${pageContext.request.contextPath}/admin.jsp" class="back-btn">返回管理员界面</a>
 
 </div>
 </body>

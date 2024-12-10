@@ -90,8 +90,12 @@
             PreparedStatement stmt = null;
             ResultSet rs = null;
 
-            // 获取管理员ID，假设已经存储在session中
-            int ID = (int) session.getAttribute("teacherId");
+            // 获取当前登录的教师ID
+            Integer ID = (Integer) request.getSession().getAttribute("teacherId");
+            if (ID == null) {
+                response.sendRedirect("../index.jsp");  // 如果没有登录，跳转到登录页面
+                return;
+            }
 
             try {
                 conn = DatabaseUtil.getConnection(); // 使用DatabaseUtil获取连接

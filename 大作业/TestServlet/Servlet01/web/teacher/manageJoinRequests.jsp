@@ -119,6 +119,13 @@
             PreparedStatement stmt = null;
             ResultSet rs = null;
 
+            // 获取当前登录的教师ID
+            Integer teacherId = (Integer) request.getSession().getAttribute("teacherId");
+            if (teacherId == null) {
+                response.sendRedirect("../index.jsp");  // 如果没有登录，跳转到登录页面
+                return;
+            }
+
             try {
                 conn = DatabaseUtil.getConnection();
                 int creatorId = (int) session.getAttribute("teacherId"); // 当前登录用户ID

@@ -48,6 +48,16 @@
         <servlet-class>DeleteClassNotificationServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>AddAdminNotificationServlet</servlet-name>
+        <servlet-class>AddAdminNotificationServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>DeleteAdminNotificationServlet</servlet-name>
+        <servlet-class>DeleteAdminNotificationServlet</servlet-class>
+    </servlet>
+
 
 
 
@@ -102,7 +112,18 @@
     <servlet-mapping>
         <servlet-name>DeleteNotificationServlet</servlet-name>
         <url-pattern>/DeleteNotificationServlet</url-pattern>
-
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AddAdminNotificationServlet</servlet-name>
+        <url-pattern>/AddAdminNotificationServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>DeleteAdminNotificationServlet</servlet-name>
+        <url-pattern>/DeleteAdminNotificationServlet</url-pattern>
+    </servlet-mapping>
+
+
 
 </web-app>
