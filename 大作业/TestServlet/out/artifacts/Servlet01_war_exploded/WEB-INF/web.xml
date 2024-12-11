@@ -63,6 +63,18 @@
         <servlet-class>ParentJoinClassServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>SendMessageServlet</servlet-name>
+        <servlet-class>SendMessageServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>SendTeacherMessageServlet</servlet-name>
+        <servlet-class>SendTeacherMessageServlet</servlet-class>
+    </servlet>
+
+
+
 
 
 
@@ -136,6 +148,20 @@
         <servlet-name>ParentJoinClassServlet</servlet-name>
         <url-pattern>/ParentJoinClassServlet</url-pattern>
     </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SendMessageServlet</servlet-name>
+        <url-pattern>/SendMessageServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SendTeacherMessageServlet</servlet-name>
+        <url-pattern>/SendTeacherMessageServlet</url-pattern>
+    </servlet-mapping>
+
+
+
+
 
 
 

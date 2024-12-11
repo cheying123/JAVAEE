@@ -54,6 +54,8 @@ public class CreateClassServlet extends HttpServlet {
             stmt.setString(3,class_briefly);
             stmt.executeUpdate();
 
+
+
             // 设置成功消息并重定向
             request.setAttribute("message", "班级创建成功，请等待管理员审核！");
             request.getRequestDispatcher("teacher/createClass.jsp").forward(request, response);
