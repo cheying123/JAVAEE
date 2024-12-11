@@ -11,8 +11,9 @@ import java.sql.PreparedStatement;
 public class ApproveJoinRequestServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int requestId = Integer.parseInt(request.getParameter("requestId")); // teacher_classes 表的主键 ID
+        int requestId = Integer.parseInt(request.getParameter("requestId"));
         String action = request.getParameter("action"); // 获取操作类型：approve 或 reject
+        String type = request.getParameter("type"); // 请求类型：teacher 或 parent
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -20,8 +21,17 @@ public class ApproveJoinRequestServlet extends HttpServlet {
         try {
             conn = DatabaseUtil.getConnection();
 
-            // 更新申请状态
-            String updateQuery = "UPDATE teacher_classes SET approval_status = ? WHERE id = ?";
+            // 根据请求类型决定目标表
+            String updateQuery = "";
+            if ("teacher".equals(type)) {
+                // 对于教师申请，更新 teacher_classes 表
+                updateQuery = "UPDATE teacher_classes SET approval_status = ? WHERE id = ?";
+            } else if ("parent".equals(type)) {
+                // 对于家长申请，更新 parent_classes 表
+                updateQuery = "UPDATE parent_classes SET status = ? WHERE id = ?";
+            }
+
+            // 执行更新操作
             stmt = conn.prepareStatement(updateQuery);
             if ("approve".equals(action)) {
                 stmt.setString(1, "approved"); // 批准

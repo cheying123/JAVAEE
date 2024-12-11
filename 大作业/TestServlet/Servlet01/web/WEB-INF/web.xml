@@ -58,6 +58,14 @@
         <servlet-class>DeleteAdminNotificationServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>ParentJoinClassServlet</servlet-name>
+        <servlet-class>ParentJoinClassServlet</servlet-class>
+    </servlet>
+
+
+
+
 
 
 
@@ -122,6 +130,11 @@
     <servlet-mapping>
         <servlet-name>DeleteAdminNotificationServlet</servlet-name>
         <url-pattern>/DeleteAdminNotificationServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ParentJoinClassServlet</servlet-name>
+        <url-pattern>/ParentJoinClassServlet</url-pattern>
     </servlet-mapping>
 
 

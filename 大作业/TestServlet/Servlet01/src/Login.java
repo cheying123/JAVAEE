@@ -46,7 +46,7 @@ public class Login extends HttpServlet {
                 rs = stmt.executeQuery();
 
                 if (rs.next()) {
-                    String checkUserST = "SELECT * FROM users WHERE username = ? AND password = ? AND status = 'approved'";
+                    String checkUserST = "SELECT * FROM users WHERE username = ? AND password = ? AND (status = 'approved' || role = 'parent')";
                     stmt = conn.prepareStatement(checkUserST);
                     stmt.setString(1, username);
                     stmt.setString(2, password);
