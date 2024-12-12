@@ -1,47 +1,44 @@
-import com.example.myapplication.util.DatabaseUtil;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
+import model.Teacher;
+import service.AuditTeacherService;
+
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
+// 审核教师的 Servlet
 public class AuditTeacherServlet extends HttpServlet {
+    private final AuditTeacherService auditTeacherService = new AuditTeacherService();
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            // 获取待审核教师列表
+            List<Teacher> pendingTeachers = auditTeacherService.getPendingTeachers();
+            request.setAttribute("pendingTeachers", pendingTeachers);
+
+            // 转发到 JSP 页面
+            request.getRequestDispatcher("/admin/AuditTeacherRegistration.jsp").forward(request, response);
+        } catch (SQLException e) {
+            throw new ServletException("获取待审核教师列表时出错", e);
+        }
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String id = request.getParameter("id");
         String action = request.getParameter("action");
-
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+        int teacherId = Integer.parseInt(request.getParameter("id"));
 
         try {
-            conn = DatabaseUtil.getConnection();
+            // 处理审核操作（通过或拒绝）
+            auditTeacherService.handleTeacherApproval(teacherId, action);
 
-            String updateQuery;
-            if (action.equals("approve")) {
-                updateQuery = "UPDATE users SET status = 'approved' WHERE id = ?";
-            } else if (action.equals("deny")) {
-                updateQuery = "DELETE FROM users WHERE id = ?";
-            } else {
-                throw new IllegalArgumentException("未知操作: " + action);
-            }
-
-            stmt = conn.prepareStatement(updateQuery);
-            stmt.setString(1, id);
-            stmt.executeUpdate();
-
-            response.sendRedirect("admin/AuditTeacherRegistration.jsp"); // 重定向回审核页面
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ServletException("处理审核请求时出错", e);
-        } finally {
-            DatabaseUtil.close(conn, stmt, rs);
+            // 重定向回审核页面
+            response.sendRedirect(request.getContextPath() + "/AuditTeacherServlet");
+        } catch (SQLException e) {
+            throw new ServletException("处理审核操作时出错", e);
         }
     }
 }

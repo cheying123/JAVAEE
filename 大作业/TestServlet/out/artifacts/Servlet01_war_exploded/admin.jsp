@@ -60,9 +60,9 @@
 <div class="container">
     <div class="login-wrapper">
         <div class="header">管理员功能界面</div>
-        <a href="admin/AuditTeacherRegistration.jsp" class="menu-item">审核教师注册</a>
+        <a href="ToShowAdminTeacher" class="menu-item">审核教师注册</a>
         <a href="ToShowAdminClass" class="menu-item">审核班级创建</a>
-        <a href="admin/manageNotifications.jsp" class="menu-item">发布系统通知</a>
+        <a href="ToShowAdminNotification" class="menu-item">管理系统通知</a>
         <a href="index.jsp" class="menu-item">退出登录</a>
     </div>
 </div>

@@ -1,16 +1,17 @@
-import service.NotificationService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import service.NotificationService;
 
 import java.io.IOException;
 
-public class AddAdminNotificationServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String title = request.getParameter("title");
-        String content = request.getParameter("content");
+
+
+public class DeleteAdminNotification extends HttpServlet {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int id = Integer.parseInt(request.getParameter("notification_id"));
 
         HttpSession session = request.getSession();
         Integer adminId = (Integer) session.getAttribute("adminId");
@@ -22,13 +23,13 @@ public class AddAdminNotificationServlet extends HttpServlet {
         }
 
         NotificationService notificationService = new NotificationService();
-        boolean isSuccess = notificationService.addNotification(adminId, title, content);
+        boolean isSuccess = notificationService.deleteNotification(id);
 
         if (isSuccess) {
-            session.setAttribute("message", "通知发布成功！");
+            session.setAttribute("message", "通知删除成功！");
             response.sendRedirect("ToShowAdminNotification");
         } else {
-            session.setAttribute("error", "发布通知失败，请稍后再试。");
+            session.setAttribute("error", "删除通知失败，请稍后再试。");
             response.sendRedirect("ToShowAdminNotification");
         }
     }

@@ -1,12 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*, com.example.myapplication.util.DatabaseUtil" %>
+<%@ page import="model.Notification" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>管理通知</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <title>通知管理</title>
     <style>
         * {
             margin: 0;
@@ -54,10 +53,9 @@
             background-color: #f4f4f4;
         }
 
-        /* 查看详情按钮绿色 */
         .view-btn {
             padding: 6px 12px;
-            background-color: #4CAF50; /* 绿色 */
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
@@ -67,13 +65,12 @@
         }
 
         .view-btn:hover {
-            background-color: #45a049; /* 悬停时变成稍深的绿色 */
+            background-color: #45a049;
         }
 
-        /* 删除按钮红色 */
         .delete-btn {
             padding: 6px 12px;
-            background-color: #f44336; /* 红色 */
+            background-color: #f44336;
             color: white;
             border: none;
             border-radius: 5px;
@@ -83,7 +80,7 @@
         }
 
         .delete-btn:hover {
-            background-color: #d32f2f; /* 悬停时变成稍深的红色 */
+            background-color: #d32f2f;
         }
 
         .back-btn {
@@ -101,20 +98,20 @@
             background-color: #1e88e5;
         }
 
-        /* 限制标题和内容的显示长度，并加上省略号 */
         .notification-title,
         .notification-content {
-            max-width: 200px; /* 限制最大宽度 */
-            white-space: nowrap; /* 防止文本换行 */
+            max-width: 200px;
+            white-space: nowrap;
             overflow: hidden;
-            text-overflow: ellipsis; /* 超出文本显示省略号 */
+            text-overflow: ellipsis;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h2>管理通知</h2>
+    <h2>通知管理</h2>
 
+    <!-- 消息提示 -->
     <%
         String message = (String) session.getAttribute("message");
         String error = (String) session.getAttribute("error");
@@ -122,11 +119,13 @@
     %>
     <div class="message success"><%= message %></div>
     <% session.removeAttribute("message"); }
-    else if (error != null) { %>
+    else if (error != null) {
+    %>
     <div class="message error"><%= error %></div>
     <% session.removeAttribute("error"); }
     %>
 
+    <!-- 通知列表 -->
     <table>
         <thead>
         <tr>
@@ -139,61 +138,33 @@
         </thead>
         <tbody>
         <%
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-
-            try {
-                conn = DatabaseUtil.getConnection();
-
-                // 获取当前登录的管理员ID
-                Integer adminId = (Integer) request.getSession().getAttribute("adminId");
-                if (adminId == null) {
-                    response.sendRedirect("../index.jsp");  // 如果没有登录，跳转到登录页面
-                    return;
-                }
-
-                // 查询管理员发布的通知
-                String query = "SELECT id, title, content, created_at FROM admin_notifications WHERE admin_id = ?";
-                stmt = conn.prepareStatement(query);
-                stmt.setInt(1, adminId); // 绑定管理员ID
-                rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    String title = rs.getString("title");
-                    String content = rs.getString("content");
-                    // 截取前100个字符显示
-                    String truncatedTitle = title.length() > 20 ? title.substring(0, 20) + "..." : title;
-                    String truncatedContent = content.length() > 100 ? content.substring(0, 100) + "..." : content;
+            // 获取通知列表
+            List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
+            if (notifications != null) {
+                for (Notification notification : notifications) {
         %>
         <tr>
-            <td><%= rs.getInt("id") %></td>
-            <td class="notification-title"><%= truncatedTitle %></td>
-            <td class="notification-content"><%= truncatedContent %></td>
-            <td><%= rs.getTimestamp("created_at") %></td>
+            <td><%= notification.getId() %></td>
+            <td class="notification-title"><%= notification.getTitle() %></td>
+            <td class="notification-content"><%= notification.getContent() %></td>
+            <td><%= notification.getCreatedAt() %></td>
             <td>
-                <!-- 查看详细内容按钮 -->
-                <a href="<%= request.getContextPath() + "viewAdminNotification.jsp?id=" + rs.getInt("id") %>" class="view-btn">查看详情</a>
-                <form action="${pageContext.request.contextPath}/DeleteAdminNotificationServlet" method="post" style="display:inline;">
-                    <input type="hidden" name="notification_id" value="<%= rs.getInt("id") %>">
+                <a href="viewAdminNotification.jsp?id=<%= notification.getId() %>" class="view-btn">查看详情</a>
+                <form action="DeleteAdminNotification" method="post" style="display:inline;">
+                    <input type="hidden" name="notification_id" value="<%= notification.getId() %>">
                     <button type="submit" class="delete-btn">删除</button>
                 </form>
             </td>
         </tr>
         <%
                 }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } finally {
-                DatabaseUtil.close(conn, stmt, rs);
             }
         %>
         </tbody>
     </table>
 
-    <a href="${pageContext.request.contextPath}/admin/addNotification.jsp" class="back-btn">发布通知</a>
-    <a href="${pageContext.request.contextPath}/admin.jsp" class="back-btn">返回管理员界面</a>
-
+    <a href="admin/addNotification.jsp" class="back-btn">发布通知</a>
+    <a href="admin.jsp" class="back-btn">返回管理员界面</a>
 </div>
 </body>
 </html>
