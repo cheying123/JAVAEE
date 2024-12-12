@@ -40,7 +40,10 @@
         <servlet-name>AddClassNotificationServlet</servlet-name>
         <servlet-class>AddClassNotificationServlet</servlet-class>
     </servlet>
-
+    <servlet>
+        <servlet-name>ToShowAdminClass</servlet-name>
+        <servlet-class>ToShowAdminClass</servlet-class>
+    </servlet>
 
 
     <servlet>
@@ -159,7 +162,10 @@
         <url-pattern>/SendTeacherMessageServlet</url-pattern>
     </servlet-mapping>
 
-
+    <servlet-mapping>
+        <servlet-name>ToShowAdminClass</servlet-name>
+        <url-pattern>/ToShowAdminClass</url-pattern>
+    </servlet-mapping>
 
 
 

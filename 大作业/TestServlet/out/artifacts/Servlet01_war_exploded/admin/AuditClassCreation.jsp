@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*, java.util.*" %>
-<%@ page import="com.example.myapplication.util.DatabaseUtil" %>
+<%@ page import="java.util.List, model.Class" %>
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -79,56 +78,34 @@
         <tr>
             <th>班级名称</th>
             <th>创建时间</th>
-            <th>创建教师ID</th> <!-- 显示教师ID -->
+            <th>创建教师ID</th>
             <th>创建教师</th>
-            <th>班级简述</th> <!-- 新增班级简述列 -->
+            <th>班级简述</th>
             <th>状态</th>
             <th>操作</th>
         </tr>
         </thead>
         <tbody>
         <%
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-
-            try {
-                conn = DatabaseUtil.getConnection(); // 使用DatabaseUtil获取连接
-                String query = "SELECT c.id, c.class_name, c.created_at, c.status, c.teacher_id, u.username, c.class_briefly " +
-                        "FROM classes c " +
-                        "JOIN users u ON c.teacher_id = u.id WHERE c.status = 'pending'";
-                stmt = conn.prepareStatement(query);
-                rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    int classId = rs.getInt("id");
-                    String className = rs.getString("class_name");
-                    String createdAt = rs.getString("created_at");
-                    String status = rs.getString("status");
-                    int teacherId = rs.getInt("teacher_id");
-                    String teacherName = rs.getString("username");
-                    String classBriefly = rs.getString("class_briefly");  // 获取班级简述
-                    if( status.equals("approved") ){
-                        status = "已通过";
-                    }else{
-                        status = "未审核";
-                    }
+            List<Class> classList = (List<Class>) request.getAttribute("classList");
+            if (classList != null) {
+                for (Class c : classList) {
         %>
         <tr>
-            <td><%= className %></td>
-            <td><%= createdAt %></td>
-            <td><%= teacherId %></td> <!-- 显示教师ID -->
-            <td><%= teacherName %></td>
-            <td><%= classBriefly %></td> <!-- 显示班级简述 -->
-            <td><%= status %></td>
+            <td><%= c.getClassName() %></td>
+            <td><%= c.getCreatedAt() %></td>
+            <td><%= c.getTeacherId() %></td>
+            <td><%= c.getTeacherName() %></td>
+            <td><%= c.getClassBriefly() %></td>
+            <td><%= c.getStatus().equals("approved") ? "已通过" : "未审核" %></td>
             <td>
-                <form method="post" action="${pageContext.request.contextPath}/AuditClassServlet" style="display: inline;">
-                    <input type="hidden" name="classId" value="<%= classId %>">
+                <form method="post" action="AuditClassServlet">
+                    <input type="hidden" name="classId" value="<%= c.getId() %>">
                     <input type="hidden" name="action" value="approve">
                     <button type="submit" class="btn">通过</button>
                 </form>
-                <form method="post" action="${pageContext.request.contextPath}/AuditClassServlet" style="display: inline;">
-                    <input type="hidden" name="classId" value="<%= classId %>">
+                <form method="post" action="AuditClassServlet">
+                    <input type="hidden" name="classId" value="<%= c.getId() %>">
                     <input type="hidden" name="action" value="deny">
                     <button type="submit" class="btn deny">拒绝</button>
                 </form>
@@ -136,21 +113,17 @@
         </tr>
         <%
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
         %>
         <tr>
-            <td colspan="7">加载数据时出错，请稍后重试。</td>
+            <td colspan="7">没有待审核的班级。</td>
         </tr>
         <%
-            } finally {
-                DatabaseUtil.close(conn, stmt, rs);
             }
         %>
         </tbody>
     </table>
-    <!-- 返回按钮 -->
-    <a href="${pageContext.request.contextPath}/admin.jsp" class="back-btn">返回管理员登录</a>
+    <a href="../admin.jsp" class="back-btn">返回管理员登录</a>
 </div>
 </body>
 </html>

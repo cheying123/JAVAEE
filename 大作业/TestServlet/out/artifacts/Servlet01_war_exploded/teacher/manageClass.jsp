@@ -99,7 +99,10 @@
 
             try {
                 conn = DatabaseUtil.getConnection(); // 使用DatabaseUtil获取连接
-                String query = "SELECT id, class_name, class_briefly, teacher_id, status FROM classes";
+                String query = "SELECT c.id, c.class_name, c.class_briefly, c.teacher_id, c.status\n" +
+                        "FROM classes c\n" +
+                        "JOIN teacher_classes tc ON c.id = tc.class_id\n" +
+                        "WHERE tc.teacher_id = ?;\n";
                 stmt = conn.prepareStatement(query);
                 rs = stmt.executeQuery();
 
