@@ -30,12 +30,18 @@ public class Login extends HttpServlet {
                         // 根据角色重定向页面
                         if ("teacher".equals(identify)) {
                             session.setAttribute("teacherId", userId);
+                            session.setAttribute("parentId", null);
+                            session.setAttribute("adminId", null);
                             request.getRequestDispatcher("teacher.jsp").forward(request, response);
                         } else if ("parent".equals(identify)) {
                             session.setAttribute("parentId", userId);
+                            session.setAttribute("teacherId", null);
+                            session.setAttribute("adminId", null);
                             request.getRequestDispatcher("parent.jsp").forward(request, response);
                         } else if ("admin".equals(identify)) {
                             session.setAttribute("adminId", userId);
+                            session.setAttribute("teacherId", null);
+                            session.setAttribute("parentId", null);
                             request.getRequestDispatcher("admin.jsp").forward(request, response);
                         }
                     } else {

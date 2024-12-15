@@ -1,5 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*, com.example.myapplication.util.DatabaseUtil" %>
+<%@ page import="dao.ParentClassDAO" %>
+<%@ page import="dao.ParentDAO" %>
+<%@ page import="model.Parent" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,44 +41,66 @@
         button:hover {
             background-color: #1976D2;
         }
+        .return-button {
+            background-color: #FF5722; /* 可以修改为你想要的颜色 */
+            color: white;
+            margin-top: 20px;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .return-button:hover {
+            background-color: #E64A19;
+        }
+        .message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>发送站内消息</h2>
+
+    <!-- 显示消息发送结果 -->
+    <div class="message">
+        <%= request.getAttribute("resultMessage") != null ? request.getAttribute("resultMessage") : "" %>
+    </div>
+
     <form action="${pageContext.request.contextPath}/SendMessageServlet" method="post">
         <label for="receiver">接收方:</label>
         <select name="receiverId" id="receiver" required>
             <%
-                Connection conn = null;
-                PreparedStatement stmt = null;
-                ResultSet rs = null;
                 int teacherId = (Integer) session.getAttribute("teacherId");
+                ParentDAO parentDAO = new ParentDAO();
+                List<Parent> parents = null;
 
                 try {
-                    conn = DatabaseUtil.getConnection();
-                    // 修改后的查询：包含班级创建者和加入班级的老师
-                    String query = "SELECT u.id, u.username FROM users u " +
-                            "INNER JOIN parent_classes pc ON u.id = pc.parent_id " +
-                            "WHERE pc.class_id IN (SELECT id FROM classes WHERE teacher_id = ? " +
-                            "                         UNION " +
-                            "                         SELECT class_id FROM teacher_classes WHERE teacher_id = ?)";
-                    stmt = conn.prepareStatement(query);
-                    stmt.setInt(1, teacherId);  // 班级创建者
-                    stmt.setInt(2, teacherId);  // 加入该班级的老师
-                    rs = stmt.executeQuery();
+                    // 获取同班的所有教师
+                    parents = parentDAO.getParentbySameClass(teacherId);
 
-                    while (rs.next()) {
-                        int parentId = rs.getInt("id");
-                        String parentName = rs.getString("username");
+                    // 检查是否有教师，若有则生成下拉选项
+                    if (parents != null && !parents.isEmpty()) {
+                        for (Parent parent : parents) {
+                            int parentId = parent.getId();
+                            String parentName = parent.getUsername();
             %>
             <option value="<%= parentId %>"><%= parentName %></option>
             <%
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    DatabaseUtil.close(conn, stmt, rs);
+                }
+            } else {
+            %>
+            <option value="">没有可选的家长</option>
+            <%
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            %>
+            <option value="">无法加载家长列表</option>
+            <%
                 }
             %>
         </select>
@@ -84,6 +110,10 @@
 
         <button type="submit">发送消息</button>
     </form>
+
+    <!-- 返回按钮 -->
+    <a href="../teacher.jsp" class="return-button">返回教师主页</a>
+
 </div>
 </body>
 </html>

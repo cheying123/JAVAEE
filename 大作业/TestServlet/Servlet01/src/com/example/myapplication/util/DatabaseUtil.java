@@ -44,7 +44,7 @@ public class DatabaseUtil {
     /**
      * 关闭资源
      *
-     * @param conn 数据库连接
+     * @param conn a_数据库连接
      * @param pstmt 预编译语句
      * @param rs 结果集
      */

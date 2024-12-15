@@ -1,5 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*, com.example.myapplication.util.DatabaseUtil" %>
+<%@ page import="java.util.List" %>
+<%@ page import="model.Notification" %>
+<%@ page import="dao.NotificationDAO" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,27 +98,34 @@
     <table>
         <thead>
         <tr>
-            <th>通知内容</th>
             <th>标题</th>
+            <th>通知内容</th>
             <th>发布时间</th>
         </tr>
         </thead>
         <tbody>
         <%
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
+            List<Notification> notifications = null;
+            NotificationDAO notificationDAO = new NotificationDAO();
             try {
-                conn = DatabaseUtil.getConnection();
-                String query = "SELECT content, title, created_at FROM admin_notifications ORDER BY created_at DESC";
-                stmt = conn.prepareStatement(query);
-                rs = stmt.executeQuery();
-                while (rs.next()) {
+                // 获取系统通知
+                notifications = notificationDAO.getAdminNotifications();
+
+                // 检查通知列表是否为空
+                if (notifications != null && !notifications.isEmpty()) {
+                    for (Notification notification : notifications) {
         %>
         <tr>
-            <td><%= rs.getString("content") %></td>
-            <td><%= rs.getString("title") %></td>
-            <td><%= rs.getTimestamp("created_at") %></td>
+            <td><%= notification.getTitle() %></td>
+            <td><%= notification.getContent() %></td>
+            <td><%= notification.getCreatedAt() %></td>
+        </tr>
+        <%
+            }
+        } else {
+        %>
+        <tr>
+            <td colspan="3" class="error-message">暂无通知</td>
         </tr>
         <%
             }
@@ -126,8 +136,6 @@
             <td colspan="3" class="error-message">加载失败，请稍后重试。</td>
         </tr>
         <%
-            } finally {
-                DatabaseUtil.close(conn, stmt, rs);
             }
         %>
         </tbody>

@@ -99,12 +99,14 @@
     <div class="dashboard-wrapper">
         <div class="header">老师功能界面</div>
         <a href="teacher/createClass.jsp" class="menu-item">创建班级</a>
+
         <a href="teacher/joinClass.jsp" class="menu-item">加入班级</a>
-        <a href="teacher/manageClass.jsp" class="menu-item">管理班级</a>
+        <a href="ToShowTeacherClasses" class="menu-item">管理班级</a>
         <a href="teacher/manageJoinRequests.jsp" class="menu-item">管理班级加入申请</a>
         <a href="teacher/manageClassNotifications.jsp" class="menu-item">管理班级通知</a>
+
         <a href="teacher/sendMessages.jsp" class="menu-item">与家长沟通</a>
-        <a href="teacher/queryMessages.jsp" class="menu-item">查询站内消息</a>
+        <a href="QueryMessagesServlet" class="menu-item">查询站内消息</a>
         <a href="teacher/viewSystemNotifications.jsp" class="menu-item">查看系统通知</a>
         <a href="index.jsp" class="menu-item">退出登录</a>
 

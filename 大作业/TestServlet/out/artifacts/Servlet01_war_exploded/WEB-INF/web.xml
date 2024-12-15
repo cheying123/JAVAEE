@@ -98,10 +98,20 @@
         <servlet-class>ToShowParentAdminNotification</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>ToShowTeacherClasses</servlet-name>
+        <servlet-class>ToShowTeacherClasses</servlet-class>
+    </servlet>
+
 
     <servlet>
         <servlet-name>DeleteAdminNotification</servlet-name>
         <servlet-class>controller.DeleteAdminNotification</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>QueryMessagesServlet</servlet-name>
+        <servlet-class>controller.QueryMessagesServlet</servlet-class>
     </servlet>
 
 
@@ -224,6 +234,16 @@
     <servlet-mapping>
         <servlet-name>ToShowParentAdminNotification</servlet-name>
         <url-pattern>/ToShowParentAdminNotification</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ToShowTeacherClasses</servlet-name>
+        <url-pattern>/ToShowTeacherClasses</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>QueryMessagesServlet</servlet-name>
+        <url-pattern>/QueryMessagesServlet</url-pattern>
     </servlet-mapping>
 
 

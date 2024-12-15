@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*, com.example.myapplication.util.DatabaseUtil" %>
+<%@ page import="java.util.List" %>
+<%@ page import="model.Class" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -81,84 +82,33 @@
             <th>班级简述</th>
             <th>教师ID</th>
             <th>状态</th>
-            <th>操作</th>
         </tr>
         </thead>
         <tbody>
         <%
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-
-            // 获取当前登录的教师ID
-            Integer ID = (Integer) request.getSession().getAttribute("teacherId");
-            if (ID == null) {
-                response.sendRedirect("../index.jsp");  // 如果没有登录，跳转到登录页面
-                return;
-            }
-
-            try {
-                conn = DatabaseUtil.getConnection(); // 使用DatabaseUtil获取连接
-                String query = "SELECT c.id, c.class_name, c.class_briefly, c.teacher_id, c.status\n" +
-                        "FROM classes c\n" +
-                        "WHERE c.teacher_id = ? -- 老师创建的班级\n" +
-                        "\n" +
-                        "UNION\n" +
-                        "\n" +
-                        "SELECT c.id, c.class_name, c.class_briefly, c.teacher_id, c.status\n" +
-                        "FROM classes c\n" +
-                        "JOIN teacher_classes tc ON c.id = tc.class_id\n" +
-                        "WHERE tc.teacher_id = ? -- 老师加入的班级\n";
-                stmt = conn.prepareStatement(query);
-                stmt.setInt(1,ID);
-                stmt.setInt(2,ID);
-                rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    int id = rs.getInt("id");
-                    String className = rs.getString("class_name");
-                    String classBriefly = rs.getString("class_briefly");
-                    int teacherId = rs.getInt("teacher_id");
-                    String status = rs.getString("status");
-
-                    // 判断教师ID是否为当前管理员ID
-                    boolean canDelete = (ID == teacherId);
+            List<Class> classes = (List<Class>) request.getAttribute("Classes");
+            if (classes != null && !classes.isEmpty()) {
+            for (Class cls : classes) {
         %>
         <tr>
-            <td><%= id %></td>
-            <td><%= className %></td>
-            <td><%= classBriefly %></td>
-            <td><%= teacherId %></td>
-            <td><%= status %></td>
-            <td>
-                <%
-                    if (canDelete) { // 如果当前管理员是该班级的创建者，显示删除按钮
-                %>
-                <form method="post" action="${pageContext.request.contextPath}/DeleteClassServlet" style="display: inline;">
-                    <input type="hidden" name="id" value="<%= id %>">
-                    <button type="submit" class="btn">删除</button>
-                </form>
-                <%
-                    }
-                %>
-            </td>
+            <td><%= cls.getId() %></td>
+            <td><%= cls.getClassName() %></td>
+            <td><%= cls.getClassBriefly() %></td>
+            <td><%= cls.getTeacherId() %></td>
+            <td><%= cls.getStatus() %></td>
         </tr>
         <%
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            } else {
         %>
         <tr>
-            <td colspan="6">加载数据时出错，请稍后重试。</td>
+            <td colspan="6">暂无班级数据。</td>
         </tr>
         <%
-            } finally {
-                DatabaseUtil.close(conn, stmt, rs);
             }
         %>
         </tbody>
     </table>
-    <!-- 返回按钮 -->
     <a href="${pageContext.request.contextPath}/teacher.jsp" class="back-btn">返回教师界面</a>
 </div>
 </body>

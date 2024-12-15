@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*, com.example.myapplication.util.DatabaseUtil" %>
+<%@ page import="model.Message" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,74 +40,64 @@
         th {
             background-color: #f4f4f4;
         }
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        /* 新增的按钮样式 */
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007bff;
+            text-decoration: none;
+            border-radius: 4px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button:active {
+            background-color: #003d80;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <h2>查询站内消息</h2>
-    <form method="get" action="queryMessages.jsp">
+    <form method="get" action="${pageContext.request.contextPath}/QueryMessagesServlet">
         <label for="sender">发送方:</label>
-        <input type="text" name="sender" id="sender" placeholder="发送方姓名">
+        <input type="text" name="sender" id="sender" placeholder="发送方姓名" value="<%= request.getParameter("sender") != null ? request.getParameter("sender") : "" %>">
 
         <label for="receiver">接收方:</label>
-        <input type="text" name="receiver" id="receiver" placeholder="接收方姓名">
+        <input type="text" name="receiver" id="receiver" placeholder="接收方姓名" value="<%= request.getParameter("receiver") != null ? request.getParameter("receiver") : "" %>">
 
         <label for="dateFrom">起始时间:</label>
-        <input type="date" name="dateFrom" id="dateFrom">
+        <input type="date" name="dateFrom" id="dateFrom" value="<%= request.getParameter("dateFrom") != null ? request.getParameter("dateFrom") : "" %>">
 
         <label for="dateTo">结束时间:</label>
-        <input type="date" name="dateTo" id="dateTo">
+        <input type="date" name="dateTo" id="dateTo" value="<%= request.getParameter("dateTo") != null ? request.getParameter("dateTo") : "" %>">
+
+        <label for="content">消息内容:</label>
+        <input type="text" name="content" id="content" placeholder="输入消息内容" value="<%= request.getParameter("content") != null ? request.getParameter("content") : "" %>">
+
+        <label for="role">角色:</label>
+        <select name="role" id="role">
+            <option value="sender" <%= "sender".equals(request.getParameter("role")) ? "selected" : "" %>>我是发送方</option>
+            <option value="receiver" <%= "receiver".equals(request.getParameter("role")) ? "selected" : "" %>>我是接收方</option>
+        </select>
 
         <button type="submit">查询</button>
     </form>
 
+    <!-- 数据表格 -->
     <%
-        String sender = request.getParameter("sender");
-        String receiver = request.getParameter("receiver");
-        String dateFrom = request.getParameter("dateFrom");
-        String dateTo = request.getParameter("dateTo");
+        List<Message> messages = (List<Message>) request.getAttribute("messages");
 
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-
-        try {
-            conn = DatabaseUtil.getConnection();
-            StringBuilder query = new StringBuilder("SELECT u1.username AS sender, u2.username AS receiver, m.content, m.created_at " +
-                    "FROM messages m " +
-                    "JOIN users u1 ON m.sender_id = u1.id " +
-                    "JOIN users u2 ON m.receiver_id = u2.id WHERE 1=1");
-
-            if (sender != null && !sender.isEmpty()) {
-                query.append(" AND u1.username LIKE ?");
-            }
-            if (receiver != null && !receiver.isEmpty()) {
-                query.append(" AND u2.username LIKE ?");
-            }
-            if (dateFrom != null && !dateFrom.isEmpty()) {
-                query.append(" AND m.created_at >= ?");
-            }
-            if (dateTo != null && !dateTo.isEmpty()) {
-                query.append(" AND m.created_at <= ?");
-            }
-
-            stmt = conn.prepareStatement(query.toString());
-            int paramIndex = 1;
-
-            if (sender != null && !sender.isEmpty()) {
-                stmt.setString(paramIndex++, "%" + sender + "%");
-            }
-            if (receiver != null && !receiver.isEmpty()) {
-                stmt.setString(paramIndex++, "%" + receiver + "%");
-            }
-            if (dateFrom != null && !dateFrom.isEmpty()) {
-                stmt.setDate(paramIndex++, java.sql.Date.valueOf(dateFrom));
-            }
-            if (dateTo != null && !dateTo.isEmpty()) {
-                stmt.setDate(paramIndex++, java.sql.Date.valueOf(dateTo));
-            }
-
-            rs = stmt.executeQuery();
+        if (messages != null && !messages.isEmpty()) {
     %>
     <table>
         <thead>
@@ -119,24 +110,29 @@
         </thead>
         <tbody>
         <%
-            while (rs.next()) {
+            for (Message message : messages) {
         %>
         <tr>
-            <td><%= rs.getString("sender") %></td>
-            <td><%= rs.getString("receiver") %></td>
-            <td><%= rs.getString("content") %></td>
-            <td><%= rs.getTimestamp("created_at") %></td>
+            <td><%= message.getSender() %></td>
+            <td><%= message.getReceiver() %></td>
+            <td><%= message.getContent() %></td>
+            <td><%= message.getCreatedAt() %></td>
         </tr>
         <%
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                DatabaseUtil.close(conn, stmt, rs);
             }
         %>
         </tbody>
     </table>
+    <%
+    } else {
+    %>
+    <p>没有找到符合条件的消息。</p>
+    <%
+        }
+    %>
+    <hr>
+    <a href="../parent.jsp" class="button">返回上一页</a>
+
 </div>
 </body>
 </html>

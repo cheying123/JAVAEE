@@ -62,22 +62,40 @@ public class TeacherDAO {
         }
     }
 
-    public boolean applyJoinClass(Integer teacherId, Integer classId) throws SQLException {
-        Connection conn = DatabaseUtil.getConnection();
+    // 获取同班的教师列表
+    public List<Teacher> getTeachersbySameClass(int parentId) throws SQLException {
+        List<Teacher> teachers = new ArrayList<>();
+        Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
-        String sql = "INSERT INTO teacher_classes (teacher_id, class_id, status) VALUES (?, ?, 'pending')";
-        stmt = conn.prepareStatement(sql);
+
         try {
-            stmt.setInt(1, teacherId);
-            stmt.setInt(2, classId);
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
+            conn = DatabaseUtil.getConnection();
+            // 修改后的查询，包括了班级老师和创建班级的老师
+            String query = "SELECT id, username FROM users WHERE id IN ( " +
+                    "SELECT teacher_id FROM teacher_classes WHERE class_id IN " +
+                    "(SELECT class_id FROM parent_classes WHERE parent_id = ?) " +
+                    ") OR id IN (" +
+                    "SELECT teacher_id FROM classes WHERE id IN " +
+                    "(SELECT class_id FROM parent_classes WHERE parent_id = ?) " +
+                    ")";
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, parentId);
+            stmt.setInt(2, parentId);  // 第二次传入parentId用于查询创建班级的老师
+            rs = stmt.executeQuery();
+
+
+            while (rs.next()) {
+                Teacher teacher = new Teacher();
+                teacher.setId(rs.getInt("id"));
+                teacher.setUsername(rs.getString("username"));
+                teachers.add(teacher);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
         } finally {
             DatabaseUtil.close(conn, stmt, rs);
         }
+        return teachers;
     }
 }
