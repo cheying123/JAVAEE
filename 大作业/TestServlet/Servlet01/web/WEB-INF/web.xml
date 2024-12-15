@@ -6,24 +6,24 @@
     <servlet>
         <servlet-name>Register</servlet-name>
 <!--两个servlet-name名字要相同-->
-        <servlet-class>Register</servlet-class>
+        <servlet-class>controller.Register</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>login</servlet-name>
         <!--两个servlet-name名字要相同（找对应）-->
-        <servlet-class>Login</servlet-class>
+        <servlet-class>controller.Login</servlet-class>
         <!--与新建的Severlet类或者html文件对应名字对应-->
     </servlet>
 
     <servlet>
         <servlet-name>AuditTeacherServlet</servlet-name>
-        <servlet-class>AuditTeacherServlet</servlet-class>
+        <servlet-class>controller.AuditTeacherServlet</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>CreateClassServlet</servlet-name>
-        <servlet-class>CreateClassServlet</servlet-class>
+        <servlet-class>controller.CreateClassServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -53,14 +53,14 @@
 
     <servlet>
         <servlet-name>AddAdminNotificationServlet</servlet-name>
-        <servlet-class>AddAdminNotificationServlet</servlet-class>
+        <servlet-class>controller.AddAdminNotificationServlet</servlet-class>
     </servlet>
 
 
 
     <servlet>
         <servlet-name>ParentJoinClassServlet</servlet-name>
-        <servlet-class>ParentJoinClassServlet</servlet-class>
+        <servlet-class>controller.ParentJoinClassServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -84,9 +84,27 @@
     </servlet>
 
     <servlet>
-        <servlet-name>DeleteAdminNotification</servlet-name>
-        <servlet-class>DeleteAdminNotification</servlet-class>
+        <servlet-name>ToShowParentClass</servlet-name>
+        <servlet-class>ToShowParentClass</servlet-class>
     </servlet>
+
+    <servlet>
+        <servlet-name>ToShowParentClassNotification</servlet-name>
+        <servlet-class>ToShowParentClassNotification</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ToShowParentAdminNotification</servlet-name>
+        <servlet-class>ToShowParentAdminNotification</servlet-class>
+    </servlet>
+
+
+    <servlet>
+        <servlet-name>DeleteAdminNotification</servlet-name>
+        <servlet-class>controller.DeleteAdminNotification</servlet-class>
+    </servlet>
+
+
 
 
 
@@ -187,8 +205,25 @@
     </servlet-mapping>
 
     <servlet-mapping>
+        <servlet-name>ToShowParentClass</servlet-name>
+        <url-pattern>/ToShowParentClass</url-pattern>
+    </servlet-mapping>
+
+
+
+    <servlet-mapping>
         <servlet-name>DeleteAdminNotification</servlet-name>
         <url-pattern>/DeleteAdminNotification</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ToShowParentClassNotification</servlet-name>
+        <url-pattern>/ToShowParentClassNotification</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ToShowParentAdminNotification</servlet-name>
+        <url-pattern>/ToShowParentAdminNotification</url-pattern>
     </servlet-mapping>
 
 

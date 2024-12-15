@@ -1,9 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="model.Teacher" %>
 <%@ page import="java.util.List" %>
-<%
-    List<Teacher> pendingTeachers = (List<Teacher>) request.getAttribute("pendingTeachers");
-%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

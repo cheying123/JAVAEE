@@ -101,9 +101,17 @@
                 conn = DatabaseUtil.getConnection(); // 使用DatabaseUtil获取连接
                 String query = "SELECT c.id, c.class_name, c.class_briefly, c.teacher_id, c.status\n" +
                         "FROM classes c\n" +
+                        "WHERE c.teacher_id = ? -- 老师创建的班级\n" +
+                        "\n" +
+                        "UNION\n" +
+                        "\n" +
+                        "SELECT c.id, c.class_name, c.class_briefly, c.teacher_id, c.status\n" +
+                        "FROM classes c\n" +
                         "JOIN teacher_classes tc ON c.id = tc.class_id\n" +
-                        "WHERE tc.teacher_id = ?;\n";
+                        "WHERE tc.teacher_id = ? -- 老师加入的班级\n";
                 stmt = conn.prepareStatement(query);
+                stmt.setInt(1,ID);
+                stmt.setInt(2,ID);
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {

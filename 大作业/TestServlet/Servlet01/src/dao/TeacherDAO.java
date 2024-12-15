@@ -61,4 +61,23 @@ public class TeacherDAO {
             DatabaseUtil.close(conn, stmt, null);
         }
     }
+
+    public boolean applyJoinClass(Integer teacherId, Integer classId) throws SQLException {
+        Connection conn = DatabaseUtil.getConnection();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String sql = "INSERT INTO teacher_classes (teacher_id, class_id, status) VALUES (?, ?, 'pending')";
+        stmt = conn.prepareStatement(sql);
+        try {
+            stmt.setInt(1, teacherId);
+            stmt.setInt(2, classId);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            DatabaseUtil.close(conn, stmt, rs);
+        }
+    }
 }

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*, com.example.myapplication.util.DatabaseUtil" %>
+<%@ page import="model.Class" %>
+<%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,6 +74,11 @@
 <body>
 <div class="container">
     <h2>加入班级</h2>
+    <%
+        List<Class> availableClasses = (List<Class>) request.getAttribute("availableClasses");
+        if (availableClasses != null && !availableClasses.isEmpty()) {
+    %>
+    <!-- 表头仅显示一次 -->
     <table>
         <thead>
         <tr>
@@ -85,107 +91,34 @@
         </thead>
         <tbody>
         <%
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-
-            // 获取当前登录的家长ID
-            Integer parentId = (Integer) request.getSession().getAttribute("parentId");
-            if (parentId == null) {
-                response.sendRedirect("index.jsp");  // 如果没有登录，跳转到登录页面
-                return;
-            }
-
-            try {
-                conn = DatabaseUtil.getConnection();
-
-                // 查询所有已生效的班级，排除当前家长已加入的班级
-                String query = "SELECT c.id, c.class_name, c.class_briefly, c.status, " +
-                        "(SELECT status FROM parent_classes pc WHERE pc.parent_id = ? AND pc.class_id = c.id) AS approval_status " +
-                        "FROM classes c " +
-                        "WHERE c.status = 'approved' " + // 只显示状态为已批准的班级
-                        "AND NOT EXISTS (SELECT 1 FROM parent_classes pc WHERE pc.parent_id = ? AND pc.class_id = c.id)"; // 排除当前家长已加入的班级
-
-                stmt = conn.prepareStatement(query);
-                stmt.setInt(1, parentId); // 当前家长ID
-                stmt.setInt(2, parentId); // 排除当前家长已加入的班级
-                rs = stmt.executeQuery();
-
-                boolean hasClasses = false; // 检查是否有班级可加入
-
-                while (rs.next()) {
-                    hasClasses = true; // 存在可加入的班级
-
-                    int classId = rs.getInt("id");
-                    String className = rs.getString("class_name");
-                    String classBriefly = rs.getString("class_briefly");
-                    String classStatus = rs.getString("status");
-                    String approvalStatus = rs.getString("approval_status");
+            for (Class c : availableClasses) {
         %>
         <tr>
-            <td><%= classId %></td>
-            <td><%= className %></td>
-            <td><%= classBriefly %></td>
-            <td><%= classStatus %></td>
+            <td><%= c.getId() %></td>
+            <td><%= c.getClassName() %></td>
+            <td><%= c.getClassBriefly() %></td>
+            <td><%= c.getStatus() %></td>
             <td>
-                <% if (approvalStatus == null) { %>
-                <!-- 未申请，显示申请按钮 -->
                 <form method="post" action="${pageContext.request.contextPath}/ParentJoinClassServlet" style="display: inline;">
-                    <input type="hidden" name="class_id" value="<%= classId %>">
+                    <input type="hidden" name="class_id" value="<%= c.getId() %>">
                     <button type="submit" class="btn">申请加入</button>
                 </form>
-                <% } else if ("pending".equals(approvalStatus)) { %>
-                <!-- 已申请，待审核 -->
-                <span style="color: orange;">待审核</span>
-                <% } else if ("approved".equals(approvalStatus)) { %>
-                <!-- 已通过 -->
-                <span style="color: green;">已加入</span>
-                <% } else if ("rejected".equals(approvalStatus)) { %>
-                <!-- 被拒绝 -->
-                <span style="color: red;">被拒绝</span>
-                <% } %>
             </td>
         </tr>
         <%
             }
-            if (!hasClasses) {
-        %>
-        <tr>
-            <td colspan="5">当前没有可加入的班级。</td>
-        </tr>
-        <%
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        %>
-        <tr>
-            <td colspan="5">加载数据时出错，请稍后重试。</td>
-        </tr>
-        <%-- 显示操作提示信息 --%>
-        <%
-            String message = (String) session.getAttribute("message");
-            String error = (String) session.getAttribute("error");
-            if (message != null) {
-        %>
-        <div style="color: green;"><%= message %></div>
-        <%
-            session.removeAttribute("message");  // 操作完成后移除消息
-        } else if (error != null) {
-        %>
-        <div style="color: red;"><%= error %></div>
-        <%
-                session.removeAttribute("error");  // 操作完成后移除错误信息
-            }
-        %>
-        <%
-            } finally {
-                DatabaseUtil.close(conn, stmt, rs);
-            }
         %>
         </tbody>
     </table>
-    <!-- 返回按钮 -->
-    <a href="${pageContext.request.contextPath}/parent.jsp" class="back-btn">返回家长界面</a>
+    <%
+    } else {
+    %>
+    <p>没有可加入的班级。</p>
+    <%
+        }
+    %>
+
+    <a href="../parent.jsp" class="back-btn">返回主页</a>
 </div>
 </body>
 </html>

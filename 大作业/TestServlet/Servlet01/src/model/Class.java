@@ -67,4 +67,7 @@ public class Class {
     public void setClassBriefly(String classBriefly) {
         this.classBriefly = classBriefly;
     }
+
+
+
 }

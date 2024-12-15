@@ -1,77 +1,68 @@
-import com.example.myapplication.util.DatabaseUtil;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import com.example.myapplication.util.DatabaseUtil;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
+import java.io.*;
+import java.sql.*;
 
 public class JoinClassServlet extends HttpServlet {
+
+    // 处理POST请求
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // 设置响应编码为 UTF-8
-        response.setContentType("text/html;charset=UTF-8");
-
-        // 获取 class_id 参数
-        String classIdStr = request.getParameter("class_id");
-
-        // 检查 class_id 是否为空或者无效
-        if (classIdStr == null || classIdStr.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "班级ID不能为空");
-            return;
-        }
-
-        int classId;
-        try {
-            classId = Integer.parseInt(classIdStr);  // 将 class_id 转换为整数
-        } catch (NumberFormatException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "无效的班级ID");
-            return;
-        }
-
-        // 获取当前登录的教师ID
-        Integer teacherId = (Integer) request.getSession().getAttribute("teacherId");
-        if (teacherId == null) {
-            response.sendRedirect("index.jsp");  // 如果没有登录，跳转到登录页面
-            return;
-        }
-
-        // 执行数据库插入操作
         Connection conn = null;
         PreparedStatement stmt = null;
+        ResultSet rs = null;
+        int classId = Integer.parseInt(request.getParameter("class_id"));
+        Integer teacherId = (Integer) request.getSession().getAttribute("teacherId");
+
+        if (teacherId == null) {
+            response.sendRedirect("../index.jsp");  // 如果没有登录，跳转到登录页面
+            return;
+        }
 
         try {
             conn = DatabaseUtil.getConnection();
 
-            // 插入加入班级申请数据
-            String insertQuery = "INSERT INTO teacher_classes (teacher_id, class_id, approval_status) " +
-                    "VALUES (?, ?, 'pending')";
-            stmt = conn.prepareStatement(insertQuery);
+            // 检查是否已经申请该班级
+            String checkQuery = "SELECT approval_status FROM teacher_classes WHERE teacher_id = ? AND class_id = ?";
+            stmt = conn.prepareStatement(checkQuery);
             stmt.setInt(1, teacherId);
             stmt.setInt(2, classId);
+            rs = stmt.executeQuery();
 
-            int rowsAffected = stmt.executeUpdate();
-
-            // 根据操作结果设置session消息
-            if (rowsAffected > 0) {
-                // 设置成功消息
-                request.getSession().setAttribute("message", "申请加入班级成功，待审核");
+            if (rs.next()) {
+                String approvalStatus = rs.getString("approval_status");
+                if ("pending".equals(approvalStatus)) {
+                    request.getSession().setAttribute("error", "您已经申请过该班级，待审核中");
+                } else if ("approved".equals(approvalStatus)) {
+                    request.getSession().setAttribute("error", "您已经加入该班级");
+                } else if ("rejected".equals(approvalStatus)) {
+                    request.getSession().setAttribute("error", "您曾申请加入该班级，但被拒绝");
+                }
             } else {
-                // 设置错误消息
-                request.getSession().setAttribute("error", "申请加入班级失败，请稍后重试");
+                // 插入申请记录
+                String insertQuery = "INSERT INTO teacher_classes (teacher_id, class_id, approval_status) VALUES (?, ?, 'pending')";
+                stmt = conn.prepareStatement(insertQuery);
+                stmt.setInt(1, teacherId);
+                stmt.setInt(2, classId);
+                int rowsAffected = stmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    request.getSession().setAttribute("message", "您的加入申请已提交，待审核");
+                } else {
+                    request.getSession().setAttribute("error", "加入班级失败，请稍后再试");
+                }
             }
 
-            // 重定向回当前页面
-            response.sendRedirect("teacher/joinClass.jsp");
-
+            // 重定向回班级加入页面
+            response.sendRedirect(request.getContextPath() + "/teacher/joinClass.jsp");
         } catch (SQLException e) {
             e.printStackTrace();
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "服务器错误，请稍后重试");
+            request.getSession().setAttribute("error", "数据库操作错误，请稍后重试");
+            response.sendRedirect(request.getContextPath() + "/teacher/joinClass.jsp");
         } finally {
-            DatabaseUtil.close(conn, stmt, null);
+            DatabaseUtil.close(conn, stmt, rs);
         }
     }
 }

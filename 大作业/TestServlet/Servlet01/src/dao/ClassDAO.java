@@ -42,4 +42,33 @@ public class ClassDAO {
             return rowsUpdated > 0;
         }
     }
+
+    // 下面为老师的功能
+
+    // 检查班级名是否存在
+    public boolean isClassNameExists(String className) throws SQLException {
+        String query = "SELECT COUNT(*) FROM classes WHERE class_name = ?";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, className);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
+    }
+
+    // 创建班级
+    public boolean createClass(String className, int teacherId, String classBriefly) throws SQLException {
+        String query = "INSERT INTO classes (class_name, teacher_id, status, class_briefly) VALUES (?, ?, 'pending', ?)";
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, className);
+            stmt.setInt(2, teacherId);
+            stmt.setString(3, classBriefly);
+            return stmt.executeUpdate() > 0;
+        }
+    }
+
+
+
 }

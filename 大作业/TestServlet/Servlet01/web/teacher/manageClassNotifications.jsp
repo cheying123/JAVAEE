@@ -156,12 +156,22 @@
                 }
 
                 // 修改SQL查询，联接查询班级名称
-                String query = "SELECT cn.id, cn.title, cn.content, cn.created_at, cn.class_id, c.class_name " +
-                        "FROM class_notifications cn " +
-                        "JOIN classes c ON cn.class_id = c.id " +
-                        "WHERE cn.teacher_id = ?";
+                String query = "SELECT cn.id, cn.title, cn.content, cn.created_at, cn.class_id, c.class_name\n" +
+                        "FROM class_notifications cn\n" +
+                        "JOIN classes c ON cn.class_id = c.id\n" +
+                        "WHERE c.teacher_id = ? -- 教师创建的班级的通知\n" +
+                        "\n" +
+                        "UNION\n" +
+                        "\n" +
+                        "SELECT cn.id, cn.title, cn.content, cn.created_at, cn.class_id, c.class_name\n" +
+                        "FROM class_notifications cn\n" +
+                        "JOIN classes c ON cn.class_id = c.id\n" +
+                        "JOIN teacher_classes tc ON c.id = tc.class_id\n" +
+                        "WHERE tc.teacher_id = ? -- 教师加入的班级的通知\n"
+                        ;
                 stmt = conn.prepareStatement(query);
                 stmt.setInt(1, (Integer) session.getAttribute("teacherId"));
+                stmt.setInt(2, (Integer) session.getAttribute("teacherId"));
                 rs = stmt.executeQuery();
 
                 while (rs.next()) {

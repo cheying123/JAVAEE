@@ -40,4 +40,15 @@ public class NotificationService {
         }
     }
 
+
+
+
+    public List<Notification> getClassNotificationsByParent(int parentId) throws SQLException {
+        return notificationDAO.getClassNotificationsByParent(parentId);
+    }
+
+    public List<Notification> getAdminNotification() throws  SQLException{
+        return notificationDAO.getAdminNotifications();
+    }
+
 }
