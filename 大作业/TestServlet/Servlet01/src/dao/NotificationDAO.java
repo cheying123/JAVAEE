@@ -1,6 +1,7 @@
 package dao;
 
 import com.example.myapplication.util.DatabaseUtil;
+import model.Class;
 import model.Notification;
 
 import java.sql.*;
@@ -63,6 +64,21 @@ public class NotificationDAO {
         }
     }
 
+    public int deleteClassNotification(int notificationId) throws SQLException {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        try {
+            conn = DatabaseUtil.getConnection();
+            String query = "DELETE FROM class_notifications WHERE id = ?";
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, notificationId);
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected;
+        } finally {
+            DatabaseUtil.close(conn, stmt, null);
+        }
+    }
+
 
     public List<Notification> getAdminNotifications() throws SQLException {
         Connection conn = null;
@@ -114,6 +130,47 @@ public class NotificationDAO {
         return notifications;
     }
 
+    public List<Notification> getClassNotificationsByTeacher(int teacherId) throws SQLException {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Notification> notifications = new ArrayList<>();
+        try {
+            conn = DatabaseUtil.getConnection();
+            // 修改SQL查询，联接查询班级名称
+            String query = "SELECT cn.id, cn.title, cn.content, cn.created_at, cn.class_id, c.class_name\n" +
+                    "FROM class_notifications cn\n" +
+                    "JOIN classes c ON cn.class_id = c.id\n" +
+                    "WHERE c.teacher_id = ? -- 教师创建的班级的通知\n" +
+                    "\n" +
+                    "UNION\n" +
+                    "\n" +
+                    "SELECT cn.id, cn.title, cn.content, cn.created_at, cn.class_id, c.class_name\n" +
+                    "FROM class_notifications cn\n" +
+                    "JOIN classes c ON cn.class_id = c.id\n" +
+                    "JOIN teacher_classes tc ON c.id = tc.class_id\n" +
+                    "WHERE tc.teacher_id = ? -- 教师加入的班级的通知\n"
+                    ;
+            stmt = conn.prepareStatement(query);
+            stmt.setInt(1, teacherId);
+            stmt.setInt(2, teacherId);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                Notification notification = new Notification();
+                notification.setId(rs.getInt("id"));
+                notification.setTitle(rs.getString("title"));
+                notification.setContent(rs.getString("content"));
+                notification.setClass_name(rs.getString("class_name"));
+                notification.setCreatedAt(rs.getTimestamp("created_at"));
+
+                notifications.add(notification);
+            }
+        } finally {
+            DatabaseUtil.close(conn, stmt, rs);
+        }
+        return notifications;
+    }
+
     public List<Notification> getClassNotifications(int userId, String role, String title, String content, String startDate, String endDate) throws SQLException {
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -131,8 +188,8 @@ public class NotificationDAO {
             } else if (role.equals("teacher")) {
                 query = "SELECT c.title, c.content, c.created_at " +
                         "FROM class_notifications c " +
-                        "JOIN teacher_classes tc ON c.class_id = tc.class_id " +
-                        "JOIN classes cl ON c.class_id = cl.id " +
+                        "LEFT JOIN teacher_classes tc ON c.class_id = tc.class_id " +
+                        "LEFT JOIN classes cl ON c.class_id = cl.id " +
                         "WHERE (tc.teacher_id = ? AND tc.approval_status = 'approved') " +
                         "OR (cl.teacher_id = ?)";
 

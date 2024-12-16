@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class Notification {
     private int id;
     private int adminId;
+    private String class_name;
     private String title;
     private String content;
     private Timestamp createdAt;
@@ -15,6 +16,9 @@ public class Notification {
 
     public int getAdminId() { return adminId; }
     public void setAdminId(int adminId) { this.adminId = adminId; }
+
+    public String getClass_name() { return class_name; }
+    public void setClass_name(String className) { this.class_name = className; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }

@@ -1,5 +1,6 @@
 
 import com.example.myapplication.util.DatabaseUtil;
+import dao.TeacherDAO;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import java.io.*;
@@ -20,7 +21,7 @@ public class JoinClassServlet extends HttpServlet {
             response.sendRedirect("../index.jsp");  // 如果没有登录，跳转到登录页面
             return;
         }
-
+        TeacherDAO teacherDAO = new TeacherDAO();
         try {
             conn = DatabaseUtil.getConnection();
 
@@ -42,13 +43,10 @@ public class JoinClassServlet extends HttpServlet {
                 }
             } else {
                 // 插入申请记录
-                String insertQuery = "INSERT INTO teacher_classes (teacher_id, class_id, approval_status) VALUES (?, ?, 'pending')";
-                stmt = conn.prepareStatement(insertQuery);
-                stmt.setInt(1, teacherId);
-                stmt.setInt(2, classId);
-                int rowsAffected = stmt.executeUpdate();
+                String fin  = teacherDAO.TeacherJoinClass(teacherId,classId);
 
-                if (rowsAffected > 0) {
+
+                if (fin.equals("true")) {
                     request.getSession().setAttribute("message", "您的加入申请已提交，待审核");
                 } else {
                     request.getSession().setAttribute("error", "加入班级失败，请稍后再试");
@@ -65,4 +63,6 @@ public class JoinClassServlet extends HttpServlet {
             DatabaseUtil.close(conn, stmt, rs);
         }
     }
+
+
 }

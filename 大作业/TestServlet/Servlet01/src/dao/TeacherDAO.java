@@ -98,4 +98,22 @@ public class TeacherDAO {
         }
         return teachers;
     }
+
+    public String TeacherJoinClass(int teacherId,int classId) throws SQLException {
+        Connection conn = DatabaseUtil.getConnection();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        String insertQuery = "INSERT INTO teacher_classes (teacher_id, class_id, approval_status) VALUES (?, ?, 'pending')";
+        stmt = conn.prepareStatement(insertQuery);
+        stmt.setInt(1, teacherId);
+        stmt.setInt(2, classId);
+        int rowsAffected = stmt.executeUpdate();
+
+        if (rowsAffected > 0) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
 }

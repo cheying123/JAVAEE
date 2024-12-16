@@ -38,7 +38,7 @@
 
     <servlet>
         <servlet-name>AddClassNotificationServlet</servlet-name>
-        <servlet-class>AddClassNotificationServlet</servlet-class>
+        <servlet-class>controller.AddClassNotificationServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>ToShowAdminClass</servlet-name>
@@ -48,7 +48,7 @@
 
     <servlet>
         <servlet-name>DeleteNotificationServlet</servlet-name>
-        <servlet-class>DeleteClassNotificationServlet</servlet-class>
+        <servlet-class>controller.DeleteClassNotificationServlet</servlet-class>
     </servlet>
 
     <servlet>

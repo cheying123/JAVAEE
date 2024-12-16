@@ -69,7 +69,7 @@
         <%= request.getAttribute("resultMessage") != null ? request.getAttribute("resultMessage") : "" %>
     </div>
 
-    <form action="${pageContext.request.contextPath}/SendTeacherMessageServlet" method="post">
+    <form action="${pageContext.request.contextPath}/SendMessageServlet" method="post">
         <label for="receiver">接收方:</label>
         <select name="receiverId" id="receiver" required>
             <%

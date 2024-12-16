@@ -1,5 +1,6 @@
 <%@ page import="model.Notification" %>
 <%@ page import="java.util.List" %>
+<%@ page import="dao.NotificationDAO" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -113,6 +114,7 @@
             </thead>
             <tbody>
             <%
+                NotificationDAO notificationDAO = new NotificationDAO();
                 List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
                 if (notifications != null && !notifications.isEmpty()) {
                     for (Notification notification : notifications) {

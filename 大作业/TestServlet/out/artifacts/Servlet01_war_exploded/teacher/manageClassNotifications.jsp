@@ -1,5 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*, com.example.myapplication.util.DatabaseUtil" %>
+<%@ page import="dao.NotificationDAO" %>
+<%@ page import="java.util.List" %>
+<%@ page import="model.Notification" %>
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -140,12 +143,9 @@
         </thead>
         <tbody>
         <%
-            Connection conn = null;
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
+
 
             try {
-                conn = DatabaseUtil.getConnection();
 
                 // 获取当前登录的教师ID
                 // 获取当前登录的教师ID
@@ -154,45 +154,29 @@
                     response.sendRedirect("../index.jsp");  // 如果没有登录，跳转到登录页面
                     return;
                 }
+                List<Notification> notifications = null;
+                NotificationDAO notificationDAO = new NotificationDAO();
+                notifications = notificationDAO.getClassNotificationsByTeacher(teacherId);
 
-                // 修改SQL查询，联接查询班级名称
-                String query = "SELECT cn.id, cn.title, cn.content, cn.created_at, cn.class_id, c.class_name\n" +
-                        "FROM class_notifications cn\n" +
-                        "JOIN classes c ON cn.class_id = c.id\n" +
-                        "WHERE c.teacher_id = ? -- 教师创建的班级的通知\n" +
-                        "\n" +
-                        "UNION\n" +
-                        "\n" +
-                        "SELECT cn.id, cn.title, cn.content, cn.created_at, cn.class_id, c.class_name\n" +
-                        "FROM class_notifications cn\n" +
-                        "JOIN classes c ON cn.class_id = c.id\n" +
-                        "JOIN teacher_classes tc ON c.id = tc.class_id\n" +
-                        "WHERE tc.teacher_id = ? -- 教师加入的班级的通知\n"
-                        ;
-                stmt = conn.prepareStatement(query);
-                stmt.setInt(1, (Integer) session.getAttribute("teacherId"));
-                stmt.setInt(2, (Integer) session.getAttribute("teacherId"));
-                rs = stmt.executeQuery();
-
-                while (rs.next()) {
-                    String title = rs.getString("title");
-                    String content = rs.getString("content");
-                    String class_Name = rs.getString("class_name"); // 获取班级名称
+                for (Notification notification : notifications) {
+                    String title = notification.getTitle();
+                    String content = notification.getContent();
+                    String class_Name = notification.getClass_name();//获取班级名称
                     // 截取前100个字符显示
                     String truncatedTitle = title.length() > 20 ? title.substring(0, 20) + "..." : title;
                     String truncatedContent = content.length() > 100 ? content.substring(0, 100) + "..." : content;
         %>
         <tr>
-            <td><%= rs.getInt("id") %></td>
+            <td><%= notification.getId() %></td>
             <td><%= class_Name %></td> <!-- 显示班级名称 -->
             <td class="notification-title"><%= truncatedTitle %></td>
             <td class="notification-content"><%= truncatedContent %></td>
-            <td><%= rs.getTimestamp("created_at") %></td>
+            <td><%= notification.getCreatedAt() %></td>
             <td>
                 <!-- 查看详细内容按钮 -->
-                <a href="<%= request.getContextPath() + "/viewTeacherNotification.jsp?id=" + rs.getInt("id") %>" class="view-btn">查看详情</a>
+                <a href="<%= request.getContextPath() + "/viewTeacherNotification.jsp?id=" + notification.getId() %>" class="view-btn">查看详情</a>
                 <form action="${pageContext.request.contextPath}/DeleteNotificationServlet" method="post" style="display:inline;">
-                    <input type="hidden" name="notification_id" value="<%= rs.getInt("id") %>">
+                    <input type="hidden" name="notification_id" value="<%= notification.getId() %>">
                     <button type="submit" class="delete-btn">删除</button>
                 </form>
             </td>
@@ -201,8 +185,6 @@
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-            } finally {
-                DatabaseUtil.close(conn, stmt, rs);
             }
         %>
         </tbody>
