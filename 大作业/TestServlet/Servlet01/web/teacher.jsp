@@ -107,6 +107,7 @@
 
         <a href="teacher/sendMessages.jsp" class="menu-item">与家长沟通</a>
         <a href="QueryMessagesServlet" class="menu-item">查询站内消息</a>
+        <a href="SearchClassNotifications" class="menu-item">查询班级通知</a>
         <a href="teacher/viewSystemNotifications.jsp" class="menu-item">查看系统通知</a>
         <a href="index.jsp" class="menu-item">退出登录</a>
 

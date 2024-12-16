@@ -113,4 +113,83 @@ public class NotificationDAO {
         }
         return notifications;
     }
+
+    public List<Notification> getClassNotifications(int userId, String role, String title, String content, String startDate, String endDate) throws SQLException {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        List<Notification> notifications = new ArrayList<>();
+
+        try {
+            conn = DatabaseUtil.getConnection();
+            String query = null;
+            // 构建 SQL 查询语句
+            if (role.equals("parent")) {
+                query = "SELECT c.title, c.content, c.created_at FROM class_notifications c " +
+                        "JOIN parent_classes p ON c.class_id = p.class_id " +
+                        "WHERE p.parent_id = ?";
+            } else if (role.equals("teacher")) {
+                query = "SELECT c.title, c.content, c.created_at " +
+                        "FROM class_notifications c " +
+                        "JOIN teacher_classes tc ON c.class_id = tc.class_id " +
+                        "JOIN classes cl ON c.class_id = cl.id " +
+                        "WHERE (tc.teacher_id = ? AND tc.approval_status = 'approved') " +
+                        "OR (cl.teacher_id = ?)";
+
+            }
+
+            // 根据条件拼接查询
+            if (title != null && !title.isEmpty()) {
+                query += " AND c.title LIKE ?";
+            }
+            if (content != null && !content.isEmpty()) {
+                query += " AND c.content LIKE ?";
+            }
+            if (startDate != null && !startDate.isEmpty()) {
+                query += " AND c.created_at >= ?";
+            }
+            if (endDate != null && !endDate.isEmpty()) {
+                query += " AND c.created_at <= ?";
+            }
+
+            stmt = conn.prepareStatement(query);
+
+            // 设置查询参数
+            stmt.setInt(1, userId);
+            if (role.equals("teacher")){
+                stmt.setInt(2, userId);  // 同样设置教师ID，分别用于条件
+            }
+            int index = 2;
+            if( role.equals("teacher") ){
+                index += 1;
+            }
+            if (title != null && !title.isEmpty()) {
+                stmt.setString(index++, "%" + title + "%");
+            }
+            if (content != null && !content.isEmpty()) {
+                stmt.setString(index++, "%" + content + "%");
+            }
+            if (startDate != null && !startDate.isEmpty()) {
+                stmt.setDate(index++, Date.valueOf(startDate));
+            }
+            if (endDate != null && !endDate.isEmpty()) {
+                stmt.setDate(index++, Date.valueOf(endDate));
+            }
+
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                Notification notification = new Notification();
+                notification.setTitle(rs.getString("title"));
+                notification.setContent(rs.getString("content"));
+                notification.setCreatedAt(rs.getTimestamp("created_at"));
+                notifications.add(notification);
+            }
+        } finally {
+            DatabaseUtil.close(conn, stmt, rs);
+        }
+        return notifications;
+    }
+
+
+
 }

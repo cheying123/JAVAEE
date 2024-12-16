@@ -43,7 +43,9 @@ public class ClassDAO {
                 "SELECT c.id, c.class_name, c.class_briefly, c.teacher_id, c.status\n" +
                 "FROM classes c\n" +
                 "JOIN teacher_classes tc ON c.id = tc.class_id\n" +
-                "WHERE tc.teacher_id = ? -- 老师加入的班级\n";
+                "WHERE tc.teacher_id = ? -- 老师加入的班级\n" +
+                "AND tc.approval_status = 'approved'; -- 只选择状态为 'approved' 的班级";
+
         try (Connection conn = DatabaseUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 

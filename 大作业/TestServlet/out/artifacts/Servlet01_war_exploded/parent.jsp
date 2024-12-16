@@ -71,6 +71,7 @@
         <a href="ToShowParentAdminNotification" class="menu-item">查看系统通知</a>
         <a href="parent/sendMessages.jsp" class="menu-item">与老师沟通</a>
         <a href="QueryMessagesServlet" class="menu-item">查询站内信息</a>
+        <a href="SearchClassNotifications" class="menu-item">查询班级通知</a>
         <a href="index.jsp" class="menu-item">退出登录</a>
     </div>
 </div>

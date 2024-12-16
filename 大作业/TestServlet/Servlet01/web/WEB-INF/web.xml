@@ -111,6 +111,11 @@
         <servlet-class>controller.QueryMessagesServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>SearchClassNotifications</servlet-name>
+        <servlet-class>controller.SearchClassNotifications</servlet-class>
+    </servlet>
+
 
 
 
@@ -238,6 +243,11 @@
     <servlet-mapping>
         <servlet-name>QueryMessagesServlet</servlet-name>
         <url-pattern>/QueryMessagesServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SearchClassNotifications</servlet-name>
+        <url-pattern>/SearchClassNotifications</url-pattern>
     </servlet-mapping>
 
 

@@ -80,8 +80,8 @@
             <th>班级ID</th>
             <th>班级名称</th>
             <th>班级简述</th>
-            <th>教师ID</th>
-            <th>状态</th>
+            <th>创建教师ID</th>
+            <th>班级状态</th>
         </tr>
         </thead>
         <tbody>

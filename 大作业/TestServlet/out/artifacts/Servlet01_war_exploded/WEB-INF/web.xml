@@ -65,13 +65,10 @@
 
     <servlet>
         <servlet-name>SendMessageServlet</servlet-name>
-        <servlet-class>SendMessageServlet</servlet-class>
+        <servlet-class>controller.SendMessageServlet</servlet-class>
     </servlet>
 
-    <servlet>
-        <servlet-name>SendTeacherMessageServlet</servlet-name>
-        <servlet-class>SendTeacherMessageServlet</servlet-class>
-    </servlet>
+
 
     <servlet>
         <servlet-name>ToShowAdminTeacher</servlet-name>
@@ -112,6 +109,11 @@
     <servlet>
         <servlet-name>QueryMessagesServlet</servlet-name>
         <servlet-class>controller.QueryMessagesServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>SearchClassNotifications</servlet-name>
+        <servlet-class>controller.SearchClassNotifications</servlet-class>
     </servlet>
 
 
@@ -194,10 +196,7 @@
         <url-pattern>/SendMessageServlet</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>SendTeacherMessageServlet</servlet-name>
-        <url-pattern>/SendTeacherMessageServlet</url-pattern>
-    </servlet-mapping>
+
 
     <servlet-mapping>
         <servlet-name>ToShowAdminClass</servlet-name>
@@ -244,6 +243,11 @@
     <servlet-mapping>
         <servlet-name>QueryMessagesServlet</servlet-name>
         <url-pattern>/QueryMessagesServlet</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SearchClassNotifications</servlet-name>
+        <url-pattern>/SearchClassNotifications</url-pattern>
     </servlet-mapping>
 
 

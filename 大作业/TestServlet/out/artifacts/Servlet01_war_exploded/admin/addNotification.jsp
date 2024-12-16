@@ -136,7 +136,7 @@
         <button type="submit">发布通知</button>
     </form>
 
-    <a href="${pageContext.request.contextPath}/admin/manageNotifications.jsp" class="back-btn">返回通知管理</a>
+    <a href="${pageContext.request.contextPath}/ToShowAdminNotification" class="back-btn">返回通知管理</a>
 </div>
 </body>
 </html>
